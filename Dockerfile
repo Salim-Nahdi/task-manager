@@ -1,14 +1,14 @@
-# Step 1: Use a "Base Image" that already has Java installed
-FROM eclipse-temurin:17-jdk-alpine
-
-# Step 2: Create a folder inside the container for our app
+FROM maven:3.8.4-openjdk-17-slim AS build
 WORKDIR /app
 
-# Step 3: Copy the JAR file we created earlier into the container
-COPY target/*.jar app.jar
+COPY pom.xml .
+COPY src ./src
 
-# Step 4: Tell the container to open port 8080 (where our app lives)
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:17-jdk-alpine
+WORKDIR /app
+
 EXPOSE 8080
 
-# Step 5: The command to actually start the app inside the container
 ENTRYPOINT ["java", "-jar", "app.jar"]
